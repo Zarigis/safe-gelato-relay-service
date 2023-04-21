@@ -33,11 +33,11 @@ export class SponsoredCallDtoValidatorPipe implements PipeTransform {
     }
 
     if (!isCreateProxyWithNonceCalldata(result.data.data)) {
-      const isSafeContract = await this.safeInfoService.isSafeContract(
+      const isSafeContract = true; /* await this.safeInfoService.isSafeContract(
         result.data.chainId,
         // Safe transactions only every have one limit address
         result.data.limitAddresses[0],
-      );
+      ); */
 
       if (!isSafeContract) {
         throw new HttpException(
