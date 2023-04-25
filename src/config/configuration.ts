@@ -6,9 +6,11 @@ export default () => ({
   },
   relayContract: {
     [SupportedChainId.POLYGON]: process.env.POLYGON_RELAY_CONTRACT,
+    [SupportedChainId.MAINNET]: process.env.MAINNET_RELAY_CONTRACT
   },
   feeToken: {
     [SupportedChainId.POLYGON]: process.env.POLYGON_FEE_TOKEN,
+    [SupportedChainId.MAINNET]: process.env.MAINNET_FEE_TOKEN
   },
   authAddr: {
     [SupportedChainId.POLYGON]: process.env.POLYGON_AUTH_ADDR,
