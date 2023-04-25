@@ -2,5 +2,5 @@ export enum SupportedChainId {
   GOERLI = '5',
   GNOSIS_CHAIN = '100',
   POLYGON = '137',
-  MAINNET = '1'
+  MAINNET = '1',
 }
