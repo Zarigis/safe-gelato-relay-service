@@ -30,16 +30,37 @@ export class GelatoSponsorService implements ISponsorService {
   async sponsoredCall(
     sponsoredCallDto: SponsoredCallDto,
   ): Promise<RelayResponse> {
-    const { chainId, data, to } = sponsoredCallDto;
+    const { chainId, safeAddr, data } = sponsoredCallDto;
 
-    const apiKey = this.configService.getOrThrow(`gelato.apiKey.${chainId}`);
+    const relayContract = this.configService.getOrThrow(
+      `relayContract.${chainId}`,
+    );
+    const feeToken = this.configService.getOrThrow(`feeToken.${chainId}`);
+    const authAddr = this.configService.getOrThrow(`authAddr.${chainId}`);
 
+    /*
     const gasLimit = sponsoredCallDto.gasLimit
       ? this.getRelayGasLimit(sponsoredCallDto.gasLimit).toString()
       : undefined;
+    */
 
-    return this.relayer.sponsoredCall({ chainId, data, target: to }, apiKey, {
-      gasLimit,
-    });
+    const request = {
+      chainId: chainId,
+      target: relayContract,
+      data: data,
+      feeToken: feeToken,
+      isRelayContext: true,
+    };
+
+    if (safeAddr.toLowerCase() == authAddr.toLowerCase()) {
+      const apiKey = this.configService.getOrThrow(`gelato.apiKey.${chainId}`);
+      const dummyRelay = this.configService.getOrThrow(`dummyRelay.${chainId}`);
+      return this.relayer.sponsoredCall(
+        { chainId: chainId, target: dummyRelay, data: data },
+        apiKey,
+      );
+    }
+
+    return this.relayer.callWithSyncFee(request);
   }
 }

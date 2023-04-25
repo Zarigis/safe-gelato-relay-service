@@ -1,9 +1,10 @@
+/*
 import {
   getMultiSendCallOnlyDeployment,
   getProxyFactoryDeployment,
   getSafeL2SingletonDeployment,
   getSafeSingletonDeployment,
-} from '@safe-global/safe-deployments';
+} from '@safe-global/safe-deployments'; */
 import { ethers } from 'ethers';
 
 // ======================== General ========================
@@ -26,12 +27,14 @@ const isCalldata = (data: string, signature: string): boolean => {
  * @param data call data
  * @returns boolean
  */
+/*
 const isExecTransactionCalldata = (data: string): boolean => {
   const EXEC_TX_SIGNATURE =
     'execTransaction(address,uint256,bytes,uint8,uint256,uint256,uint256,address,address,bytes)';
 
   return isCalldata(data, EXEC_TX_SIGNATURE);
 };
+*/
 
 /**
  * Validates that the call `data` is `execTransaction` and the `to` address is not self, other than rejections
@@ -40,12 +43,12 @@ const isExecTransactionCalldata = (data: string): boolean => {
  * @param data execTransaction call data
  * @returns whether the call is valid
  */
+/*
 export const isValidExecTransactionCall = (
-  to: string,
   data: string,
 ): boolean => {
   const EXEC_TX_FRAGMENT =
-    'function execTransaction(address to, uint256 value, bytes calldata data, uint8 operation, uint256 safeTxGas, uint256 baseGas, uint256 gasPrice, address gasToken, address payable refundReceiver, bytes memory signatures)';
+    'function execTransaction(address safe, address to, uint256 value, bytes calldata data, uint8 operation, uint256 safeTxGas, uint256 baseGas, uint256 gasPrice, address gasToken, address payable refundReceiver, bytes memory signatures)';
 
   if (!isExecTransactionCalldata(data)) {
     return false;
@@ -53,16 +56,17 @@ export const isValidExecTransactionCall = (
 
   const execTxInterface = new ethers.Interface([EXEC_TX_FRAGMENT]);
 
-  const [txTo, txValue, txData] = execTxInterface.decodeFunctionData(
+  const [txSafe, txTo, txValue, txData] = execTxInterface.decodeFunctionData(
     EXEC_TX_FRAGMENT,
     data,
   );
 
-  const toSelf = to === txTo;
+  const toSelf = txSafe === txTo;
   const isRejectionTx = toSelf && Number(txValue) === 0 && txData === '0x';
 
   return !toSelf || isRejectionTx;
 };
+*/
 
 // ======================= multiSend =======================
 
@@ -71,16 +75,21 @@ export const isValidExecTransactionCall = (
  * @param data call data
  * @returns boolean
  */
+/*
 const isMultiSendCalldata = (data: string): boolean => {
   const MULTISEND_TX_SIGNATURE = 'multiSend(bytes)';
 
   return isCalldata(data, MULTISEND_TX_SIGNATURE);
 };
+*/
+
+/*
 
 interface MultiSendTransactionData {
   readonly to: string;
   readonly data: string;
 }
+*/
 
 /**
  * Decodes the transactions contained in a multiSend call
@@ -88,6 +97,8 @@ interface MultiSendTransactionData {
  * @returns array of individual transaction data
  */
 // TODO: Replace with https://github.com/safe-global/safe-core-sdk/pull/342 when merged
+
+/*
 const decodeMultiSendTxs = (
   encodedMultiSendData: string,
 ): MultiSendTransactionData[] => {
@@ -95,11 +106,11 @@ const decodeMultiSendTxs = (
   const INDIVIDUAL_TX_DATA_LENGTH = 2 + 40 + 64 + 64;
 
   const MULTISEND_FRAGMENT =
-    'function multiSend(bytes memory transactions) public payable';
+    'function multiSend(address safe, bytes memory transactions) public payable';
 
   const multiSendInterface = new ethers.Interface([MULTISEND_FRAGMENT]);
 
-  const [decodedMultiSendData] = multiSendInterface.decodeFunctionData(
+  const [, decodedMultiSendData] = multiSendInterface.decodeFunctionData(
     MULTISEND_FRAGMENT,
     encodedMultiSendData,
   );
@@ -140,6 +151,7 @@ const decodeMultiSendTxs = (
 
   return txs;
 };
+*/
 
 /**
  * Extracts the common `to` address from a multisend transaction if it is not a self-transaction
@@ -147,6 +159,7 @@ const decodeMultiSendTxs = (
  * @param data multisend call data
  * @returns the `to` address of all batched transactions contained in `data` or `undefined` if the transactions do not share one common `to` address.
  */
+/*
 export const getSafeAddressFromMultiSend = (data: string): string | null => {
   const individualTxs = decodeMultiSendTxs(data);
 
@@ -154,8 +167,8 @@ export const getSafeAddressFromMultiSend = (data: string): string | null => {
     return null;
   }
 
-  const isEveryTxValidExecTx = individualTxs.every(({ to, data }) => {
-    return isValidExecTransactionCall(to, data);
+  const isEveryTxValidExecTx = individualTxs.every(({ data }) => {
+    return isValidExecTransactionCall(data);
   });
 
   if (!isEveryTxValidExecTx) {
@@ -174,6 +187,7 @@ export const getSafeAddressFromMultiSend = (data: string): string | null => {
 
   return ethers.getAddress(firstRecipient);
 };
+*/
 
 /**
  * Validates that the call `data` is `multiSend` and the `to` address is the MultiSendCallOnly deployment.
@@ -183,6 +197,7 @@ export const getSafeAddressFromMultiSend = (data: string): string | null => {
  * @param data multiSend call data
  * @returns whether the call is valid
  */
+/*
 export const isValidMultiSendCall = (
   chainId: string,
   to: string,
@@ -202,6 +217,7 @@ export const isValidMultiSendCall = (
 
   return true;
 };
+*/
 
 // ===================== createProxyWithNonce ======================
 
@@ -211,12 +227,16 @@ export const isCreateProxyWithNonceCalldata = (data: string): boolean => {
   return isCalldata(data, SETUP_TX_SIGNATURE);
 };
 
+/*
 interface CreateProxyWithNonceTransactionData {
   readonly singleton: string;
   readonly initializer: string;
   readonly saltNonce: bigint;
 }
 
+*/
+
+/*
 const decodeCreateProxyWithNonce = (
   encodedData: string,
 ): CreateProxyWithNonceTransactionData => {
@@ -239,7 +259,9 @@ const decodeCreateProxyWithNonce = (
     saltNonce,
   };
 };
+*/
 
+/*
 export const isValidCreateProxyWithNonceCall = (
   chainId: string,
   to: string,
@@ -289,3 +311,4 @@ export const getOwnersFromCreateProxyWithNonce = (
 
   return owners.map(ethers.getAddress);
 };
+*/
